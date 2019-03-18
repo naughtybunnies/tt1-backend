@@ -55,6 +55,10 @@ class Repository(object):
     def set_url(self, url, start_key, end_key):
         self.scraper.set_url(url, start_key, end_key)
         self.update()
+    
+    def set_file(self, start_urls):
+        self.scraper.set_file(start_urls)
+        self.update()
 
     def update(self):
         path = os.path.join(PATH_REPO, self.id)

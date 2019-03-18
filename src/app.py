@@ -44,3 +44,6 @@ class App(object):
 
     def set_url(self, repo, url, start_key, end_key):
         repo.set_url(url, start_key, end_key)
+    
+    def set_file(self, repo, start_urls):
+        repo.set_file(start_urls)

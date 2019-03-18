@@ -2,8 +2,7 @@ import json
 import time
 
 from flask import Flask, jsonify, request, make_response, Response
-from urllib3.exceptions import URLRequired
-
+ 
 from flask_cors import CORS, cross_origin
 from src.app import App
 
@@ -28,7 +27,7 @@ def create_repo():
         app.create_repo(repo_name)
         res = make_response('New repository created.', 203)
     except:
-        res = make_response('A repository with this name already exists.', 400)
+        res = make_response('A repository with the given name already exists.', 400)
     return res
     
 @flask_app.route('/repository/delete/', methods=['POST'])
@@ -64,6 +63,18 @@ def set_url():
         repo = app.get_repo(name=repo_name)
         app.set_url(repo, url, start_key, end_key)
         res = make_response('OK.', 200)
-    except URLRequired:
-        res = make_response("Base url is needed.", 400)
+    except:
+        res = make_response("There's something wrong, please check again.", 400)
+    return res
+
+@flask_app.route('/repository/scraper/file/<repo_name>', methods=['POST'])
+def given_file(repo_name):
+    try:
+        repo = app.get_repo(name=repo_name)
+        f = request.files['file'].read().decode('utf-8')
+        start_urls = f.split('\n')
+        app.set_file(repo, start_urls)
+        res = make_response("OK.", 200)
+    except: 
+        res = make_response("Given unsupported file format.", 400)
     return res

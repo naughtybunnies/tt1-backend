@@ -92,16 +92,26 @@ class Scraper(Bubble):
         self.total_file_count = len(self.start_urls)
         self.start_scrape()
 
-    def start_scrape(self):
-        def clear():       
-            self.scraped_file_count = 0           
-            path = os.path.join(PATH_REPO, self.repo.get_id(), PATH_SCRAPED)
-            files = os.listdir(path)
-            for f in files:
-                path_file = os.path.join(path, f)
-                #print(path_file)
-                os.remove(path_file)
+    def set_file(self, start_urls):
+        self.start_urls = [
+            {
+                'url': url,
+                'key': index
+            } for index, url in enumerate(start_urls)
+        ]
+        self.total_file_count = len(self.start_urls)
+        self.start_scrape()
 
+    def clear(self):       
+        self.scraped_file_count = 0           
+        path = os.path.join(PATH_REPO, self.repo.get_id(), PATH_SCRAPED)
+        files = os.listdir(path)
+        for f in files:
+            path_file = os.path.join(path, f)
+            #print(path_file)
+            os.remove(path_file)
+
+    def start_scrape(self):
         def scrape(repo, start_urls):
             with requests.Session() as s:
                 for url in start_urls:
@@ -116,7 +126,7 @@ class Scraper(Bubble):
                 f.write(res.text)
 
         if self.state != 'Start':
-            clear() #   Clear every scraped filed to start again
+            self.clear() #   Clear every scraped filed to start again
             self.set_state('Start')
             self.process = Process(target=scrape, args=(self.repo.get_id(), self.start_urls))
             self.process.start()
