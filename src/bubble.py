@@ -1,11 +1,18 @@
 from multiprocessing import Process, Manager, Value
 from urllib import parse
-from src.config import PATH_REPO, PATH_SCRAPED 
+from src.config import PATH_REPO, PATH_SCRAPED, PATH_PARSED
+from src.graph import Graph, Node
+from src.datatable import DataTable
+from bs4 import BeautifulSoup
 
 import requests
 import os
 import re
 import time
+import pickle
+import sys
+import re
+import json
 
 class Bubble(object):
     state = 'Unavailable'
@@ -92,6 +99,20 @@ class Scraper(Bubble):
         self.total_file_count = len(self.start_urls)
         self.start_scrape()
 
+    def submit_file(self, start_urls):
+        self.start_urls = [
+            {
+                'url': url,
+                'key': index
+            } for index, url in enumerate(start_urls)
+        ]
+        self.total_file_count = len(self.start_urls)
+
+    def discard_file(self):
+        self.start_urls = []
+        self.total_file_count = 0
+        self.clear()
+        
     def set_file(self, start_urls):
         self.start_urls = [
             {
@@ -131,7 +152,8 @@ class Scraper(Bubble):
             self.process = Process(target=scrape, args=(self.repo.get_id(), self.start_urls))
             self.process.start()
             self.process.join()
-            self.set_state('Done')    
+            self.set_state('Done') 
+            self.repo.parser.state = 'Ready'
 
     def stop_scrape(self):
         self.process.terminate()
@@ -141,9 +163,49 @@ class Scraper(Bubble):
         self.start_scrape()
 
 class Parser(Bubble):
+
     def __init__(self, repo, data=None):
         super().__init__(repo, data)
-        self.name  = 'Parser'
+
+        path_parsed = os.path.join(PATH_REPO, self.repo.get_id(), PATH_PARSED)
+        self.path = {
+            'graph' : os.path.join(path_parsed, 'graph'),
+        }
+
+        if self.state == 'Ready' :
+            path_scraped = os.path.join(PATH_REPO, self.repo.get_id(), PATH_SCRAPED)
+            first_file  = os.listdir(path_scraped)[0]
+            self.graph = Graph(os.path.join(path_scraped, first_file))
+        self.datatable = DataTable()
+    
+    
+    def start_parse(self):
+        def soup_xpath(xpath, soupobject):
+            pattern = re.compile('.*\[([0-9]*)\]')
+            from_body = xpath.replace("/html/body", "")
+            for item in from_body.split("/")[1:]:
+                result = re.match(pattern, item)
+                if(result is not None):
+                    soupobject = soupobject.find_all(item.split('[')[0], recursive=False)[int(result.groups()[0]) - 1]
+                else:
+                    soupobject = soupobject.find(item)
+                return soupobject.text.strip()
+        
+        parsed_path = os.path.join(PATH_REPO, self.repo.get_id(), PATH_PARSED)
+        scraped_path = os.path.join(PATH_REPO, self.repo.get_id(), PATH_SCRAPED)
+        scraped_file = os.listdir(scraped_path)
+        data_table = self.datatable.data_table
+        #print(scraped_file)
+
+        for file_name in scraped_file:
+            graph = Graph(os.path.join(scraped_path, file_name))
+            parsed_data = {}
+            #print('Parsing file {}'.format(file_name))
+            for row in data_table:
+                #print('Soup xpath {}'.format(row))
+                parsed_data[row] = soup_xpath(data_table[row], graph.root_node.bs4_node)
+            with open(os.path.join(parsed_path, file_name), 'w') as f:
+                json.dump(parsed_data, f)
 
 class Exporter(Bubble):
     def __init__(self, repo, data=None):

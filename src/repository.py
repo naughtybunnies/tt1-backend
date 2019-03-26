@@ -1,4 +1,4 @@
-from src.config import PATH_REPO, PATH_SCRAPED 
+from src.config import PATH_REPO, PATH_SCRAPED, PATH_PARSED 
 from src import bubble  
 
 import uuid
@@ -55,7 +55,15 @@ class Repository(object):
     def set_url(self, url, start_key, end_key):
         self.scraper.set_url(url, start_key, end_key)
         self.update()
-    
+
+    def submit_file(self, start_urls):
+        self.scraper.submit_file(start_urls)
+        self.update()
+
+    def discard_file(self):
+        self.scraper.discard_file()
+        self.update()
+
     def set_file(self, start_urls):
         self.scraper.set_file(start_urls)
         self.update()
@@ -86,6 +94,9 @@ class Repository(object):
             # Create repo's scraped directory to save files from scraper
             path_scraped = os.path.join(path, PATH_SCRAPED)
             os.mkdir(path_scraped)
+            # Create repo's scraped directory to save files from parser
+            path_parsed = os.path.join(path, PATH_PARSED)
+            os.mkdir(PATH_PARSED)
         except FileExistsError as e:
             print('{}'.format(e))
 
@@ -124,3 +135,6 @@ class Repository(object):
 
     def start_scrape(self):
         self.scraper.start_scrape()
+    
+    def start_parse(self):
+        self.parser.start_parse()
