@@ -62,11 +62,12 @@ class Graph(object):
         
         return response
 
-    def create_xpath(self, node_id=None):
-        if node_id is None:
+    def create_xpath(self, node_id = None):
+        if node_id == None:
             xpath = [ self.xpath_soup(self.nodes[n].bs4_node) for n in self.nodes]
         else:
             xpath = self.xpath_soup(self.nodes[node_id].bs4_node)
+            
         return xpath
 
     def xpath_soup(self, element):
@@ -92,7 +93,7 @@ class Node(object):
         self.text = bs4_tag.text      #  Create text of the file.
         
     def render_response(self):
-        response = {"id": self._id, "label": self.tag_name, "html": self.html_string, "text": self.text}
+        response = {"id": self._id, "label": self.tag_name, "title": self.text}
         return response
 
     def delete_node(self):

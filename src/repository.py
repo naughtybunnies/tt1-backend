@@ -96,7 +96,7 @@ class Repository(object):
             os.mkdir(path_scraped)
             # Create repo's scraped directory to save files from parser
             path_parsed = os.path.join(path, PATH_PARSED)
-            os.mkdir(PATH_PARSED)
+            os.mkdir(path_parsed)
         except FileExistsError as e:
             print('{}'.format(e))
 
@@ -136,5 +136,5 @@ class Repository(object):
     def start_scrape(self):
         self.scraper.start_scrape()
     
-    def start_parse(self):
-        self.parser.start_parse()
+    def start_export(self):
+        return self.exporter.start_export(self.parser.graph, self.parser.datatable)

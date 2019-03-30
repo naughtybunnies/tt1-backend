@@ -89,7 +89,6 @@ class Scraper(Bubble):
             } for key in range(int(start_key), int(end_key)+1)
         ]
         '''
-        
         self.start_urls = [
             {
                 'url': url.format(key),
@@ -153,7 +152,9 @@ class Scraper(Bubble):
             self.process.start()
             self.process.join()
             self.set_state('Done') 
-            self.repo.parser.state = 'Ready'
+            self.repo.parser.set_state('Ready')
+            self.repo.parser.create_graph()
+            self.repo.update()
 
     def stop_scrape(self):
         self.process.terminate()
@@ -166,48 +167,83 @@ class Parser(Bubble):
 
     def __init__(self, repo, data=None):
         super().__init__(repo, data)
-
-        path_parsed = os.path.join(PATH_REPO, self.repo.get_id(), PATH_PARSED)
-        self.path = {
-            'graph' : os.path.join(path_parsed, 'graph'),
-        }
-
         if self.state == 'Ready' :
-            path_scraped = os.path.join(PATH_REPO, self.repo.get_id(), PATH_SCRAPED)
-            first_file  = os.listdir(path_scraped)[0]
-            self.graph = Graph(os.path.join(path_scraped, first_file))
+            self.create_graph()
+
         self.datatable = DataTable()
-    
-    
-    def start_parse(self):
-        def soup_xpath(xpath, soupobject):
-            pattern = re.compile('.*\[([0-9]*)\]')
-            from_body = xpath.replace("/html/body", "")
+
+    def create_graph(self): 
+        path_scraped = os.path.join(PATH_REPO, self.repo.get_id(), PATH_SCRAPED)
+        first_file  = os.listdir(path_scraped)[0]
+        self.graph = Graph(os.path.join(path_scraped, first_file))
+        return self.graph
+
+    def add_column(self, column, node_id):
+        xpath = self.graph.create_xpath(node_id)
+        self.datatable.add_column(column, xpath)
+
+    def clear(self):       
+        self.scraped_file_count = 0           
+        path = os.path.join(PATH_REPO, self.repo.get_id(), PATH_PARSED)
+        files = os.listdir(path)
+        for f in files:
+            path_file = os.path.join(path, f)
+            #print(path_file)
+            os.remove(path_file)
+
+    def save(self):
+        self.repo.exporter.set_state('Ready')
+        self.repo.update()
+
+class Exporter(Bubble):
+    def __init__(self, repo, data=None):
+        super().__init__(repo, data)
+        self.name  = 'Exporter'
+        self.finished_file_count = 0
+        self.total_file_count    = self.get_total_file_count()
+
+    def get_bubble(self):
+        return {
+            'state'                     :   self.state,
+            'finished_file_count'       :   self.finished_file_count if self.state in ['Start', 'Done'] else None,
+            'total_file_count'          :   self.total_file_count    if self.state in ['Start', 'Done'] else None,
+        } 
+
+    def get_total_file_count(self):
+        path_scraped = os.path.join(PATH_REPO, self.repo.get_id(), PATH_SCRAPED)
+        total  = len(os.listdir(path_scraped))
+        return total
+
+    def start_export(self, graph, datatable):
+
+        def soup_xpath(xpathstring, soupobject):
+            pattern = re.compile(r'.*\[([0-9]*)\]')
+            from_body = xpathstring.replace("/html/body", "")
             for item in from_body.split("/")[1:]:
                 result = re.match(pattern, item)
                 if(result is not None):
                     soupobject = soupobject.find_all(item.split('[')[0], recursive=False)[int(result.groups()[0]) - 1]
                 else:
                     soupobject = soupobject.find(item)
-                return soupobject.text.strip()
-        
-        parsed_path = os.path.join(PATH_REPO, self.repo.get_id(), PATH_PARSED)
-        scraped_path = os.path.join(PATH_REPO, self.repo.get_id(), PATH_SCRAPED)
-        scraped_file = os.listdir(scraped_path)
-        data_table = self.datatable.data_table
-        #print(scraped_file)
+            return soupobject.text.strip()
 
-        for file_name in scraped_file:
-            graph = Graph(os.path.join(scraped_path, file_name))
-            parsed_data = {}
-            #print('Parsing file {}'.format(file_name))
-            for row in data_table:
-                #print('Soup xpath {}'.format(row))
-                parsed_data[row] = soup_xpath(data_table[row], graph.root_node.bs4_node)
-            with open(os.path.join(parsed_path, file_name), 'w') as f:
-                json.dump(parsed_data, f)
-
-class Exporter(Bubble):
-    def __init__(self, repo, data=None):
-        super().__init__(repo, data)
-        self.name  = 'Exporter'
+        scraped_path    =  os.path.join(PATH_REPO, self.repo.get_id(), PATH_SCRAPED)
+        scraped_file    =  os.listdir(scraped_path)
+        data_table      =  datatable.data_table
+        if self.state == 'Ready':
+            count = 0
+            #print(scraped_file)
+            parsed_data = []
+            self.set_state('Start')
+            for file_name in scraped_file:
+                graph = Graph(os.path.join(scraped_path, file_name))
+                data    =   {}
+                #print('Parsing file {}'.format(file_name))
+                for row in data_table:
+                    #print('Soup xpath {}'.format(row))
+                    data[row] = soup_xpath(data_table[row], graph.root_node.bs4_node)
+                parsed_data.append(data)
+                count = count+1
+                self.finished_file_count = count
+            self.set_state('Done') 
+            return parsed_data

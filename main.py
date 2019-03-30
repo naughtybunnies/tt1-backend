@@ -11,10 +11,6 @@ CORS(flask_app)
 
 app = App()
 
-@flask_app.route('/', methods=['GET'])
-def index():
-    return 'TT1 Senior Project'
-    
 @flask_app.route('/getstatus', methods=['GET'])
 def getstatus():
     repo_status = [repo.get_status() for repo in app.repo]
@@ -130,7 +126,6 @@ def get_graph(repo_name):
     res = graph.create_response()
     return jsonify(res)
 
-
 @flask_app.route('/repository/<repo_name>/graph/expand/', methods=['POST'])
 def expand_graph(repo_name):
     repo = app.get_repo(name=repo_name)
@@ -156,9 +151,9 @@ def add_column(repo_name):
     repo = app.get_repo(name=repo_name)
     parser = repo.parser
     column_name = request.json['column_name']
-    xpath       = request.json['xpath']
-    parser.datatable.add_column(column_name, xpath)
-    res = make_response('OK', 200)
+    node_id       = request.json['node_id']
+    parser.add_column(column_name, node_id)
+    res = make_response('OK.', 200)
     return res
 
 @flask_app.route('/repository/<repo_name>/datatable/delete/', methods=['POST'])
@@ -167,7 +162,7 @@ def del_column(repo_name):
     parser = repo.parser
     column_name = request.json['column_name'] 
     parser.datatable.del_column(column_name)
-    res = make_response('OK', 200)
+    res = make_response('OK.', 200)
     return res
 
 @flask_app.route('/repository/<repo_name>/datatable/clear/', methods=['POST'])
@@ -175,12 +170,11 @@ def clear_datatable(repo_name):
     repo = app.get_repo(name=repo_name)
     parser = repo.parser
     parser.datatable.clear_datatable()
-    res = make_response('OK', 200)
+    res = make_response('OK.', 200)
     return res
 
-@flask_app.route('/repository/<repo_name>/parser/confirm/', methods=['POST'])
+@flask_app.route('/repository/<repo_name>/exporter/json', methods=['GET'])
 def parse_file(repo_name):
     repo = app.get_repo(name=repo_name)
-    repo.start_parse()
-    res = make_response('OK' 200)
-    return res
+    res = repo.start_export()
+    return jsonify(res)
