@@ -130,20 +130,22 @@ def get_graph(repo_name):
 def expand_graph(repo_name):
     repo = app.get_repo(name=repo_name)
     parser = repo.parser
-    graph = parser.graph
+    #graph = parser.graph
     node_id = request.json['node_id']
-    graph.expand_node(int(node_id))
-    res = graph.create_response()
+    #graph.expand_node(int(node_id))
+    parser.expand_node(node_id)
+    res = parser.graph.create_response()
     return jsonify(res)
 
 @flask_app.route('/repository/<repo_name>/graph/delete/', methods=['POST'])
 def del_node(repo_name):
     repo = app.get_repo(name=repo_name)
     parser = repo.parser
-    graph = parser.graph
+    #graph = parser.graph
     node_id = request.json['node_id']
-    graph.del_node(int(node_id))
-    res = graph.create_response()
+    #graph.del_node(int(node_id))
+    parser.del_node(node_id)
+    res = parser.graph.create_response()
     return jsonify(res)
 
 @flask_app.route('/repository/<repo_name>/datatable/add/', methods=['POST'])
@@ -161,7 +163,7 @@ def del_column(repo_name):
     repo = app.get_repo(name=repo_name)
     parser = repo.parser
     column_name = request.json['column_name'] 
-    parser.datatable.del_column(column_name)
+    parser.del_column(column_name)
     res = make_response('OK.', 200)
     return res
 
@@ -172,9 +174,3 @@ def clear_datatable(repo_name):
     parser.datatable.clear_datatable()
     res = make_response('OK.', 200)
     return res
-
-@flask_app.route('/repository/<repo_name>/exporter/json', methods=['GET'])
-def parse_file(repo_name):
-    repo = app.get_repo(name=repo_name)
-    res = repo.start_export()
-    return jsonify(res)

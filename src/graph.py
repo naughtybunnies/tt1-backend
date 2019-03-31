@@ -94,6 +94,9 @@ class Node(object):
         
     def render_response(self):
         response = {"id": self._id, "label": self.tag_name, "title": self.text}
+        while '\n\n' in response['title']:  # confiscate \n\n from the text until there is only one \n in the response
+            response['title'] = response['title'].replace('\n\n', '\n')
+        response['title'] = response['title'].strip()
         return response
 
     def delete_node(self):

@@ -137,11 +137,12 @@ class Scraper(Bubble):
                 for url in start_urls:
                     res = s.get(url['url'])
                     print('{} {}'.format(res.url, res.status_code))
+                    res.encoding = 'utf-8'
                     save_file(repo, res, url['key'])
 
         def save_file(repo, res, key):
             path_scraped = os.path.join(PATH_REPO, repo, PATH_SCRAPED)
-            path_file = os.path.join(path_scraped, str(key))
+            path_file = os.path.join(path_scraped, str(key)+'.html')
             with open(path_file, 'w') as f:
                 f.write(res.text)
 
@@ -178,9 +179,18 @@ class Parser(Bubble):
         self.graph = Graph(os.path.join(path_scraped, first_file))
         return self.graph
 
+    def expand_node(self, node_id):
+        self.graph.expand_node(node_id)
+
+    def del_node(self, node_id):
+        self.graph.del_node(node_id)
+        
     def add_column(self, column, node_id):
         xpath = self.graph.create_xpath(node_id)
         self.datatable.add_column(column, xpath)
+
+    def del_column(self, column):
+        self.datatable.del_column(column)
 
     def clear(self):       
         self.scraped_file_count = 0           
@@ -225,13 +235,13 @@ class Exporter(Bubble):
                     soupobject = soupobject.find_all(item.split('[')[0], recursive=False)[int(result.groups()[0]) - 1]
                 else:
                     soupobject = soupobject.find(item)
-            return soupobject.text.strip()
+            return soupobject.text.strip().strip(u'\u200b')
 
         scraped_path    =  os.path.join(PATH_REPO, self.repo.get_id(), PATH_SCRAPED)
         scraped_file    =  os.listdir(scraped_path)
         data_table      =  datatable.data_table
         if self.state == 'Ready':
-            count = 0
+            self.finished_file_count = 0
             #print(scraped_file)
             parsed_data = []
             self.set_state('Start')
@@ -243,7 +253,7 @@ class Exporter(Bubble):
                     #print('Soup xpath {}'.format(row))
                     data[row] = soup_xpath(data_table[row], graph.root_node.bs4_node)
                 parsed_data.append(data)
-                count = count+1
-                self.finished_file_count = count
+                self.finished_file_count = self.finished_file_count+1
+                #print("finished files count: {}".format(self.finished_file_count))
             self.set_state('Done') 
             return parsed_data
