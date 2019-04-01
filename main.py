@@ -1,8 +1,7 @@
 import json
 import time
-import validators
 
-from flask import Flask, jsonify, request, make_response, Response
+from flask import Flask, jsonify, request, make_response, send_file, Response
 from flask_cors import CORS, cross_origin
 from src.app import App
 
@@ -148,6 +147,13 @@ def del_node(repo_name):
     res = parser.graph.create_response()
     return jsonify(res)
 
+@flask_app.route('/repository/<repo_name>/datatable/', methods=['GET'])
+def get_datatable(repo_name):
+    repo = app.get_repo(name=repo_name)
+    parser  = repo.parser
+    res = parser.datatable.create_response(repo.get_id())
+    return jsonify(res)
+
 @flask_app.route('/repository/<repo_name>/datatable/add/', methods=['POST'])
 def add_column(repo_name):
     repo = app.get_repo(name=repo_name)
@@ -155,8 +161,8 @@ def add_column(repo_name):
     column_name = request.json['column_name']
     node_id       = request.json['node_id']
     parser.add_column(column_name, node_id)
-    res = make_response('OK.', 200)
-    return res
+    res = parser.datatable.create_response(repo.get_id())
+    return jsonify(res)
 
 @flask_app.route('/repository/<repo_name>/datatable/delete/', methods=['POST'])
 def del_column(repo_name):
@@ -164,13 +170,26 @@ def del_column(repo_name):
     parser = repo.parser
     column_name = request.json['column_name'] 
     parser.del_column(column_name)
-    res = make_response('OK.', 200)
-    return res
+    res = parser.datatable.create_response(repo.get_id())
+    return jsonify(res)
 
 @flask_app.route('/repository/<repo_name>/datatable/clear/', methods=['POST'])
 def clear_datatable(repo_name):
     repo = app.get_repo(name=repo_name)
     parser = repo.parser
     parser.datatable.clear_datatable()
-    res = make_response('OK.', 200)
-    return res
+    res = parser.datatable.create_response(repo.get_id())
+    return jsonify(res)
+
+@flask_app.route('/repository/<repo_name>/exporter/json', methods=['GET'])
+def export_json(repo_name):
+    repo = app.get_repo(name=repo_name)
+    res = repo.start_export()
+    content = json.dumps(res)
+    return Response(content, 
+            mimetype='application/json',
+            headers={'Content-Disposition':'attachment;filename={}json'.format(repo.get_name())})
+    #path = repo.exporter.get_parsed_path()
+    #return send_file(path)
+    #res = repo.start_export()
+    #return jsonify(res)
