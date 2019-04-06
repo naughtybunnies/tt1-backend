@@ -154,10 +154,10 @@ class Scraper(Bubble):
             self.process = Process(target=scrape, args=(
                 self.repo.get_id(), self.start_urls))
             self.process.start()
-            self.process.join()     # Blocking execution -  frontend is waiting for response
+            #self.process.join()     # Blocking execution -  frontend is waiting for response
             self.set_state('Done')  # Set state with in scrape method
             self.repo.parser.set_state('Ready')
-            self.repo.parser.create_graph()
+            self.repo.exporter.set_state('Ready')
             self.repo.update()
 
     def stop_scrape(self):
@@ -174,14 +174,15 @@ class Parser(Bubble):
         super().__init__(repo, data)
         if self.state == 'Ready':
             self.create_graph()
-
+        self.graph = None
         self.datatable = DataTable()
 
     def create_graph(self):
-        path_scraped = os.path.join(
-            PATH_REPO, self.repo.get_id(), PATH_SCRAPED)
-        first_file = os.listdir(path_scraped)[0]
-        self.graph = Graph(os.path.join(path_scraped, first_file))
+        if not hasattr(self, 'graph') or self.graph is None:
+            path_scraped = os.path.join(
+                PATH_REPO, self.repo.get_id(), PATH_SCRAPED)
+            first_file = os.listdir(path_scraped)[0]
+            self.graph = Graph(os.path.join(path_scraped, first_file))
         return self.graph
 
     def expand_node(self, node_id):
@@ -205,11 +206,6 @@ class Parser(Bubble):
             path_file = os.path.join(path, f)
             # print(path_file)
             os.remove(path_file)
-
-    def save(self):
-        self.repo.exporter.set_state('Ready')
-        self.repo.update()
-
 
 class Exporter(Bubble):
     def __init__(self, repo, data=None):
@@ -256,25 +252,25 @@ class Exporter(Bubble):
         scraped_file = os.listdir(scraped_path)
         data_table   = datatable.data_table
 
-        if self.state == 'Ready':
-            self.finished_file_count = 0
-            # print(scraped_file)
-            parsed_data = []
-            self.set_state('Start')
-            for file_name in scraped_file:
-                graph = Graph(os.path.join(scraped_path, file_name))
-                data = {'id': file_name.split('.')[0]}
-                #print('Parsing file {}'.format(file_name))
-                for row in data_table:
-                    #print('Soup xpath {}'.format(row))
-                    data[row] = soup_xpath(
-                        data_table[row], graph.root_node.bs4_node)
-                parsed_data.append(data)
-                self.finished_file_count = self.finished_file_count+1
-                self.repo.update()
-                #print("finished files count: {}".format(self.finished_file_count))
-            parsed_file = self.get_parsed_path()
-            with open(parsed_file, 'w') as f:
-                json.dump(parsed_data, f)
-            self.set_state('Done')
-            return parsed_data
+        #if self.state == 'Ready':
+        self.finished_file_count = 0
+        # print(scraped_file)
+        parsed_data = []
+        #self.set_state('Start')
+        for file_name in scraped_file:
+            graph = Graph(os.path.join(scraped_path, file_name))
+            data = {'id': file_name.split('.')[0]}
+            #print('Parsing file {}'.format(file_name))
+            for row in data_table:
+                #print('Soup xpath {}'.format(row))
+                data[row] = soup_xpath(
+                    data_table[row], graph.root_node.bs4_node)
+            parsed_data.append(data)
+            self.finished_file_count = self.finished_file_count+1
+            self.repo.update()
+            #print("finished files count: {}".format(self.finished_file_count))
+        parsed_file = self.get_parsed_path()
+        with open(parsed_file, 'w') as f:
+            json.dump(parsed_data, f)
+        #self.set_state('Done')
+        return parsed_data

@@ -221,7 +221,7 @@ def get_graph(repo_name):
     '''
     repo = app.get_repo(name=repo_name)
     parser = repo.parser
-    graph = parser.graph
+    graph = parser.create_graph()
     res = graph.create_response()
     return jsonify(res)
 
