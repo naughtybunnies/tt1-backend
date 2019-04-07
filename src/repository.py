@@ -5,13 +5,14 @@ import uuid
 import os
 import json
 import shutil
-
+import datetime
 
 class Repository(object):
     def __init__(self, name=None, id=None):
         if name is not None:  # Create new repository
             self.id = str(uuid.uuid4())
             self.name = name
+            self.createdDate = datetime.datetime.now().strftime("%d-%b-%Y")
             self.create_directory(self.id)
 
             # Assign this repo to all the bubble
@@ -78,7 +79,8 @@ class Repository(object):
                 'scraper'  :   self.scraper.get_bubble(),
                 'parser'   :   self.parser.get_bubble(),
                 'exporter' :   self.exporter.get_bubble(),
-            }
+            },
+            'createdDate'  :   self.createdDate
         }
         self.id = data['id']
         self.name = data['name']
@@ -126,12 +128,16 @@ class Repository(object):
             'exporter': self.exporter.get_bubble()
         }
 
+    def get_createdDate(self):
+        return self.createdDate
+
     def get_status(self):
         self.update()
         return {
             'id'     : self.get_id(),
             'name'   : self.get_name(),
             'bubble' : self.get_bubble(),
+            'createdDate': self.get_createdDate()
         }
 
     def start_scrape(self):
