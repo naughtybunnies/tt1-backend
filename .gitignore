@@ -7,4 +7,7 @@ __pycache__
 repositories
 Main.ipynb
 
+
+*.ipynb
 venv/*
+
