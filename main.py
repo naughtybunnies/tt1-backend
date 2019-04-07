@@ -68,7 +68,8 @@ def rename_repo():
     '''Rename repository API. [ Repository REST API ] [ POST ]
 
     Request:
-        { "name": "" }
+        { "name": ",
+          "new_name: "" }
 
     Response:
         200 - Successful rename
