@@ -344,10 +344,10 @@ def export_json(repo_name):
     '''
     repo = app.get_repo(name=repo_name)
     res = repo.start_export()
-    content = json.dumps(res)
+    content = json.dumps(res, ensure_ascii=False)
     return Response(content,
                     mimetype='application/json',
-                    headers={'Content-Disposition': 'attachment;filename={}json'.format(repo.get_name())})
+                    headers={'Content-Disposition': 'attachment;filename={}.json'.format(repo.get_name())})
     #path = repo.exporter.get_parsed_path()
     # return send_file(path)
     #res = repo.start_export()
