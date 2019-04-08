@@ -240,11 +240,14 @@ class Exporter(Bubble):
             from_body = xpathstring.replace("/html/body", "")
             for item in from_body.split("/")[1:]:
                 result = re.match(pattern, item)
-                if(result is not None):
-                    soupobject = soupobject.find_all(item.split('[')[0], recursive=False)[
-                        int(result.groups()[0]) - 1]
-                else:
-                    soupobject = soupobject.find(item)
+                try:
+                    if(result is not None):
+                        soupobject = soupobject.find_all(item.split('[')[0], recursive=False)[
+                            int(result.groups()[0]) - 1]
+                    else:
+                        soupobject = soupobject.find(item)
+                except:
+                    return ''
             return soupobject.text.strip().strip(u'\u200b')
 
         scraped_path = os.path.join(
