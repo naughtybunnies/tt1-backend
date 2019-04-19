@@ -383,9 +383,9 @@ def get_rules(repo_name):
     parser = repo.parser
     exporter = repo.exporter
     rdf = exporter.get_rdf()
-    rdf.add_rule_using_column("FOAF:id", "id", "object")   # add mock data
+    #rdf.add_rule_using_column("FOAF:id", "id", "object")   # add mock data
     res = rdf.get_rules()
-    rdf.remove_rule(-1)  # remove mock data
+    #rdf.remove_rule(-1)  # remove mock data
     return jsonify(res)
 
 @flask_app.route('/repository/<repo_name>/rdf/add_rule/', methods=['POST'])

@@ -74,6 +74,7 @@ class RDF_API(object):
     
     def remove_rule(self, index):
         self.requests.pop(index)
+        self._re_render_graph()
         return self.get_rules()
 
     def get_vocabulary(self):
