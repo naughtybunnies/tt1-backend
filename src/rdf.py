@@ -21,7 +21,7 @@ class RDF_API(object):
         
         self.graph = Graph()
         
-        self.vocabs = {'FOAF': FOAF, 'RDF': RDF}
+        self.vocabs = {'foaf': FOAF, 'rdf': RDF}
     
     def add_rule_using_column(self, predicate, object_column, as_type, add_transaction=True):
         p = self._parse_predicate(predicate)

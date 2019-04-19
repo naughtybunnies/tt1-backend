@@ -359,7 +359,7 @@ def get_rdf(repo_name):
     '''Get repository's rdf data. [ RDF REST API ] [ GET ]
 
     Response:
-        200 - RDF Data - { "base_url" : "", entity_uri : "", objects: {literal: [], entity: [], volcabulary: []}
+        200 - RDF Data - { "base_url" : "", entity_uri : "", parsed_column: []}
     '''
     repo = app.get_repo(name=repo_name)
     parser = repo.parser
@@ -368,7 +368,7 @@ def get_rdf(repo_name):
     res = {
         'base_url' : rdf.baseURL.strip('/'),
         'entity_uri': rdf.entityIdentifier.strip(),
-        'parsed_column': ['id', 'name']
+        'parsed_column': ['id', 'name', 'position']
     }
     return jsonify(res)
 
@@ -394,9 +394,9 @@ def add_rule(repo_name):
 
     Response:
     '''
-    pred = request.json['predicate']
-    obj = request.json['object']['objectcolumn']
-    as_type = request.json['object']['objecttype'].split('(')[0].lower()
+    pred = request.json['predicate']['word']
+    obj = request.json['object']['objectColumn']
+    as_type = request.json['object']['objectType'].split('(')[0].lower()
     repo = app.get_repo(name=repo_name)
     exporter = repo.exporter
     rdf = exporter.get_rdf()
@@ -447,8 +447,8 @@ def get_vocabulary(repo_name):
     res = rdf.get_vocabulary()
     return jsonify(res)
 
-@flask_app.route('/repository/<repo_name>/rdf/export/', methods=['GET'])
-def export_rdf(repo_name):
+@flask_app.route('/repository/<repo_name>/rdf/export/<format>', methods=['GET'])
+def export_rdf(repo_name, format):
     '''Export a rdf graph. [ RDF REST API ] [ GET ]
 
     Response:
@@ -456,9 +456,9 @@ def export_rdf(repo_name):
     mimetype = {
         'turtle'    :   'text/turtle',
         'n3'        :   'text/n3',
-        'rdf'       :   'application/rdf+xml'
+        'xml'       :   'application/rdf+xml'
     }
-    format = 'turtle' if request.json['format'] is None else request.json['format'] 
+    #format = 'turtle' if request.json['format'] is None else request.json['format'] 
     repo = app.get_repo(name=repo_name)
     exporter = repo.exporter
     rdf = exporter.get_rdf()
