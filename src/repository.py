@@ -41,6 +41,7 @@ class Repository(object):
             self.scraper  = bubble.Scraper(self, data['bubble']['scraper'])
             self.parser   = bubble.Parser(self, data['bubble']['parser'])
             self.exporter = bubble.Exporter(self, data['bubble']['exporter'])
+            self.createdDate = data['createdDate']
 
     def set_id(self, id):
         self.id = id

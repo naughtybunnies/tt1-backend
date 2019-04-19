@@ -1,0 +1,92 @@
+{
+    "rdf:first": {
+        "label": "rdf:first",
+        "comment": "The first item in the subject RDF list.",
+        "prop": "isDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\nrange:http://www.w3.org/2000/01/rdf-schema#Resource\ntype:http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\ndomain:http://www.w3.org/1999/02/22-rdf-syntax-ns#List\n"
+    },
+    "rdf:XMLLiteral": {
+        "label": "rdf:XMLLiteral",
+        "comment": "The datatype of XML literal values.",
+        "prop": "subClassOf:http://www.w3.org/2000/01/rdf-schema#Literal\ntype:http://www.w3.org/2000/01/rdf-schema#Datatype\nisDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\n"
+    },
+    "rdf:Statement": {
+        "label": "rdf:Statement",
+        "comment": "The class of RDF statements.",
+        "prop": "type:http://www.w3.org/2000/01/rdf-schema#Class\nsubClassOf:http://www.w3.org/2000/01/rdf-schema#Resource\nisDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\n"
+    },
+    "rdf:subject": {
+        "label": "rdf:subject",
+        "comment": "The subject of the subject RDF statement.",
+        "prop": "type:http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\nrange:http://www.w3.org/2000/01/rdf-schema#Resource\ndomain:http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement\nisDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\n"
+    },
+    "rdf:Seq": {
+        "label": "rdf:Seq",
+        "comment": "The class of ordered containers.",
+        "prop": "type:http://www.w3.org/2000/01/rdf-schema#Class\nisDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\nsubClassOf:http://www.w3.org/2000/01/rdf-schema#Container\n"
+    },
+    "rdf:value": {
+        "label": "rdf:value",
+        "comment": "Idiomatic property used for structured values.",
+        "prop": "domain:http://www.w3.org/2000/01/rdf-schema#Resource\nrange:http://www.w3.org/2000/01/rdf-schema#Resource\nisDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\ntype:http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\n"
+    },
+    "rdf:HTML": {
+        "label": "rdf:HTML",
+        "comment": "The datatype of RDF literals storing fragments of HTML content",
+        "prop": "seeAlso:http://www.w3.org/TR/rdf11-concepts/#section-html\nsubClassOf:http://www.w3.org/2000/01/rdf-schema#Literal\ntype:http://www.w3.org/2000/01/rdf-schema#Datatype\nisDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\n"
+    },
+    "rdf:Alt": {
+        "label": "rdf:Alt",
+        "comment": "The class of containers of alternatives.",
+        "prop": "isDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\ntype:http://www.w3.org/2000/01/rdf-schema#Class\nsubClassOf:http://www.w3.org/2000/01/rdf-schema#Container\n"
+    },
+    "rdf:List": {
+        "label": "rdf:List",
+        "comment": "The class of RDF Lists.",
+        "prop": "subClassOf:http://www.w3.org/2000/01/rdf-schema#Resource\ntype:http://www.w3.org/2000/01/rdf-schema#Class\nisDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\n"
+    },
+    "rdf:PlainLiteral": {
+        "label": "rdf:PlainLiteral",
+        "comment": "The class of plain (i.e. untyped) literal values, as used in RIF and OWL 2",
+        "prop": "isDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\nseeAlso:http://www.w3.org/TR/rdf-plain-literal/\ntype:http://www.w3.org/2000/01/rdf-schema#Datatype\nsubClassOf:http://www.w3.org/2000/01/rdf-schema#Literal\n"
+    },
+    "rdf:langString": {
+        "label": "rdf:langString",
+        "comment": "The datatype of language-tagged string values",
+        "prop": "subClassOf:http://www.w3.org/2000/01/rdf-schema#Literal\nisDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\nseeAlso:http://www.w3.org/TR/rdf11-concepts/#section-Graph-Literal\ntype:http://www.w3.org/2000/01/rdf-schema#Datatype\n"
+    },
+    "rdf:object": {
+        "label": "rdf:object",
+        "comment": "The object of the subject RDF statement.",
+        "prop": "domain:http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement\nrange:http://www.w3.org/2000/01/rdf-schema#Resource\ntype:http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\nisDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\n"
+    },
+    "rdf:Property": {
+        "label": "rdf:Property",
+        "comment": "The class of RDF properties.",
+        "prop": "subClassOf:http://www.w3.org/2000/01/rdf-schema#Resource\ntype:http://www.w3.org/2000/01/rdf-schema#Class\nisDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\n"
+    },
+    "rdf:nil": {
+        "label": "rdf:nil",
+        "comment": "The empty list, with no items in it. If the rest of a list is nil then the list has no more items in it.",
+        "prop": "type:http://www.w3.org/1999/02/22-rdf-syntax-ns#List\nisDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\n"
+    },
+    "rdf:predicate": {
+        "label": "rdf:predicate",
+        "comment": "The predicate of the subject RDF statement.",
+        "prop": "isDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\ntype:http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\ndomain:http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement\nrange:http://www.w3.org/2000/01/rdf-schema#Resource\n"
+    },
+    "rdf:Bag": {
+        "label": "rdf:Bag",
+        "comment": "The class of unordered containers.",
+        "prop": "isDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\ntype:http://www.w3.org/2000/01/rdf-schema#Class\nsubClassOf:http://www.w3.org/2000/01/rdf-schema#Container\n"
+    },
+    "rdf:rest": {
+        "label": "rdf:rest",
+        "comment": "The rest of the subject RDF list after the first item.",
+        "prop": "isDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\ndomain:http://www.w3.org/1999/02/22-rdf-syntax-ns#List\ntype:http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\nrange:http://www.w3.org/1999/02/22-rdf-syntax-ns#List\n"
+    },
+    "rdf:type": {
+        "label": "rdf:type",
+        "comment": "The subject is an instance of a class.",
+        "prop": "domain:http://www.w3.org/2000/01/rdf-schema#Resource\nrange:http://www.w3.org/2000/01/rdf-schema#Class\nisDefinedBy:http://www.w3.org/1999/02/22-rdf-syntax-ns#\ntype:http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\n"
+    }
+}
