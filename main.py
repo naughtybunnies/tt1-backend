@@ -353,3 +353,117 @@ def export_json(repo_name):
     # return send_file(path)
     #res = repo.start_export()
     # return jsonify(res)
+
+@flask_app.route('/repository/<repo_name>/rdf/', methods=['GET'])
+def get_rdf(repo_name):
+    '''Get repository's rdf data. [ RDF REST API ] [ GET ]
+
+    Response:
+        200 - RDF Data - { "base_url" : "", entity_uri : "", parsed_column: []}
+    '''
+    repo = app.get_repo(name=repo_name)
+    parser = repo.parser
+    exporter = repo.exporter
+    rdf = exporter.get_rdf()
+    res = {
+        'base_url' : rdf.baseURL.strip('/'),
+        'entity_uri': rdf.entityIdentifier.strip(),
+        'parsed_column': ['id', 'name', 'position']
+    }
+    return jsonify(res)
+
+@flask_app.route('/repository/<repo_name>/rdf/rules/', methods=['GET'])
+def get_rules(repo_name):
+    '''Get repository's rdf rules. [ RDF REST API ] [ GET ]
+
+    Response:
+        200 - RDF Data - [{s:'', p:'', o:''}, ...]
+    '''
+    repo = app.get_repo(name=repo_name)
+    parser = repo.parser
+    exporter = repo.exporter
+    rdf = exporter.get_rdf()
+    #rdf.add_rule_using_column("FOAF:id", "id", "object")   # add mock data
+    res = rdf.get_rules()
+    #rdf.remove_rule(-1)  # remove mock data
+    return jsonify(res)
+
+@flask_app.route('/repository/<repo_name>/rdf/add_rule/', methods=['POST'])
+def add_rule(repo_name):
+    '''Add a rule to the repository's rdf. [ RDF REST API ] [ POST ]
+
+    Response:
+    '''
+    pred = request.json['predicate']['word']
+    obj = request.json['object']['objectColumn']
+    as_type = request.json['object']['objectType'].split('(')[0].lower()
+    repo = app.get_repo(name=repo_name)
+    exporter = repo.exporter
+    rdf = exporter.get_rdf()
+    rdf.add_rule_using_column(pred, obj, as_type)
+    res = rdf.get_rules()
+    return jsonify(res)
+
+
+@flask_app.route('/repository/<repo_name>/rdf/remove_rule/', methods=['POST'])
+def remove_rule(repo_name):
+    '''Remove a rule given row index from repository's rdf. [ RDF REST API ] [ POST ]
+
+    Response:
+    '''
+    row = request.json['index']
+    repo = app.get_repo(name=repo_name)
+    exporter = repo.exporter
+    rdf = exporter.get_rdf()
+    rdf.remove_rule(int(row))
+    res = rdf.get_rules()
+    return jsonify(res)
+
+@flask_app.route('/repository/<repo_name>/rdf/set_identifier/', methods=['POST'])
+def set_identifier(repo_name):
+    '''Set a new entity identifier. [ RDF REST API ] [ POST ]
+
+    Response:
+    '''
+    identifier  = request.json['identifier']
+    baseurl  = request.json['baseurl']
+    repo = app.get_repo(name=repo_name)
+    exporter = repo.exporter
+    rdf = exporter.get_rdf()
+    rdf.set_entityIdentifier(identifier)
+    rdf.set_baseURL(baseurl)
+    res = 'OK' 
+    return res
+
+@flask_app.route('/repository/<repo_name>/rdf/vocabulary/', methods=['GET'])
+def get_vocabulary(repo_name):
+    '''Set a new entity identifier. [ RDF REST API ] [ POST ]
+
+    Response:
+    '''
+    repo = app.get_repo(name=repo_name)
+    exporter = repo.exporter
+    rdf = exporter.get_rdf()
+    res = rdf.get_vocabulary()
+    return jsonify(res)
+
+@flask_app.route('/repository/<repo_name>/rdf/export/<format>', methods=['GET'])
+def export_rdf(repo_name, format):
+    '''Export a rdf graph. [ RDF REST API ] [ GET ]
+
+    Response:
+    ''' 
+    mimetype = {
+        'turtle'    :   'text/turtle',
+        'n3'        :   'text/n3',
+        'xml'       :   'application/rdf+xml'
+    }
+    #format = 'turtle' if request.json['format'] is None else request.json['format'] 
+    repo = app.get_repo(name=repo_name)
+    exporter = repo.exporter
+    rdf = exporter.get_rdf()
+    content = rdf.serialize_graph(format) 
+    return Response(content,
+                    mimetype='{}'.format(mimetype[format]),
+                    headers={'Content-Disposition': 'attachment;filename={}.{}'.format(repo.get_name(),format)})
+ 

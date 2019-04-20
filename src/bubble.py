@@ -3,6 +3,7 @@ from urllib import parse
 from src.config import PATH_REPO, PATH_SCRAPED, PATH_PARSED
 from src.graph import Graph, Node
 from src.datatable import DataTable
+from src.rdf    import RDF_API
 from bs4 import BeautifulSoup
 
 import requests
@@ -194,6 +195,7 @@ class Parser(Bubble):
     def add_column(self, column, node_id):
         xpath = self.graph.create_xpath(node_id)
         self.datatable.add_column(column, xpath)
+        self.repo.exporter.rdf = RDF_API(self.datatable.create_response(self.repo.get_id(), all=True))
 
     def del_column(self, column):
         self.datatable.del_column(column)
@@ -240,11 +242,14 @@ class Exporter(Bubble):
             from_body = xpathstring.replace("/html/body", "")
             for item in from_body.split("/")[1:]:
                 result = re.match(pattern, item)
-                if(result is not None):
-                    soupobject = soupobject.find_all(item.split('[')[0], recursive=False)[
-                        int(result.groups()[0]) - 1]
-                else:
-                    soupobject = soupobject.find(item)
+                try:
+                    if(result is not None):
+                        soupobject = soupobject.find_all(item.split('[')[0], recursive=False)[
+                            int(result.groups()[0]) - 1]
+                    else:
+                        soupobject = soupobject.find(item)
+                except:
+                    return ''
             return soupobject.text.strip().strip(u'\u200b')
 
         scraped_path = os.path.join(
@@ -274,3 +279,9 @@ class Exporter(Bubble):
             json.dump(parsed_data, f)
         #self.set_state('Done')
         return parsed_data
+    
+    def get_rdf(self):
+        if 'rdf' not in self.__dict__:
+            self.rdf = RDF_API(self.repo.parser.datatable.create_response(self.repo.get_id()))
+        return self.rdf
+
