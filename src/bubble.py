@@ -280,8 +280,10 @@ class Exporter(Bubble):
         #self.set_state('Done')
         return parsed_data
     
+    def insert_to_mongo(self, mongo, database, collection):
+        parsed_data = self.start_export(self.repo.parser.graph, self.repo.datatable)
+
     def get_rdf(self):
         if 'rdf' not in self.__dict__:
             self.rdf = RDF_API(self.repo.parser.datatable.create_response(self.repo.get_id()))
         return self.rdf
-

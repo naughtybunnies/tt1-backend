@@ -467,3 +467,18 @@ def export_rdf(repo_name, format):
                     mimetype='{}'.format(mimetype[format]),
                     headers={'Content-Disposition': 'attachment;filename={}.{}'.format(repo.get_name(),format)})
  
+@flask_app.route('/repository/<repo_name>/export/mongo', methods=['POST'])
+def export_mongo(repo_name):
+    '''Insert to MongoDB. [ RDF REST API ] [ GET ]
+
+    Response:
+    '''     
+    mongo = request.json['endpoint']
+    database      = request.json['database']
+    collection    = request.json['collection']
+    repo = app.get_repo(name=repo_name)
+    exporter = repo.exporter
+    res = exporter.insert_to_mongo(mongo, database, collection)
+    return res
+
+ 
