@@ -27,12 +27,11 @@ class RDF_API(object):
         p = self._parse_predicate(predicate)
         
         for row in self.data:
-            s = self.baseURL[str(row[self.entityIdentifier])]
+            s = self.baseURL[str(row[self.entityIdentifier]).replace(' ', '_')]
 
             if(as_type == 'literal'): o = Literal(row[object_column])
             elif(as_type == 'object'): o = self.baseURL[row[object_column]]
             else: o = self._parse_predicate(object_column)
-                
             triplet = (s, p, o)
 
             self.graph.add(triplet)
@@ -57,7 +56,7 @@ class RDF_API(object):
         return self.vocabs[vocab][word]
     
     def serialize_graph(self, format='turtle'):
-        graph_string = self.graph.serialize(format=format).decode()
+        graph_string = self.graph.serialize(format=format, encoding='UTF-8').decode()
         return graph_string
 
     def get_rules(self):
