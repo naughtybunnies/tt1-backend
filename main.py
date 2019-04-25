@@ -368,7 +368,7 @@ def get_rdf(repo_name):
     res = {
         'base_url' : rdf.baseURL.strip('/'),
         'entity_uri': rdf.entityIdentifier.strip(),
-        'parsed_column': ['id', 'name', 'position']
+        'parsed_column': parser.datatable.get_column()
     }
     return jsonify(res)
 

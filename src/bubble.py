@@ -199,6 +199,9 @@ class Parser(Bubble):
 
     def del_column(self, column):
         self.datatable.del_column(column)
+    
+    def get_parsed_data(self):
+        return self.datatable.create_response(self.repo.get_id(), all=True)
 
     def clear(self):
         self.scraped_file_count = 0

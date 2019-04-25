@@ -21,7 +21,10 @@ class App(object):
         self.repo.append(new_repo)
 
     def rename_repo(self, repo, new_name):
-        repo.rename(new_name)
+        if new_name in [ repo.get_name() for repo in self.get_repo() ]:
+            raise ValueError('Name already exists.')
+        else:
+            repo.rename(new_name)
 
     def delete_repo(self, repo):
         print('Delete repo')
