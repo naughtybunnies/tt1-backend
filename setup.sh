@@ -1,11 +1,11 @@
 #!/bin/sh
-echo "FLASK IS STARTING"
-ls -l
-cd flask_app
-ls -l
+echo "Installing backend flask application"
 
+python3 -m venv venv
 
-export FLASK_ENV=development
-export FLASK_APP=main.py
+. venv/bin/activate
 
-flask run --host=0.0.0.0
+pip install -r requirements.txt
+
+echo "Installation finished.
+    Run ./start to start the application"
