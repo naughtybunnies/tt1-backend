@@ -92,14 +92,17 @@ class Scraper(Bubble):
             } for key in range(int(start_key), int(end_key)+1)
         ]
         '''
-        self.start_urls = [
-            {
-                'url': url.format(key),
-                'key': key
-            } for key in range(int(start_key), int(end_key)+1)
-        ]
-        self.total_file_count = len(self.start_urls)
-        self.start_scrape()
+        if '{}' in url:
+            self.start_urls = [
+                {
+                    'url': url.format(key),
+                    'key': key
+                } for key in range(int(start_key), int(end_key)+1)
+            ]
+            self.total_file_count = len(self.start_urls)
+            self.start_scrape()
+        else:
+            raise ValueError('Given url is invalid')
 
     def submit_file(self, start_urls):
         self.start_urls = [
