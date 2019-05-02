@@ -1,0 +1,7 @@
+flask
+flask-cors
+requests==2.21.0
+validators
+bs4
+lxml
+rdflib
