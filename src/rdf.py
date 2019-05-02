@@ -24,13 +24,19 @@ class RDF_API(object):
         self.vocabs = {'foaf': FOAF, 'rdf': RDF}
     
     def add_rule_using_column(self, predicate, object_column, as_type, add_transaction=True):
+        
+        def quoter(url):
+            unsafe = [' ', '"', '<', '>', '#', '%', '{', '}', '|', '\\', '^', '~', '[', ']', '`', ':', '(', ')', '-', '\n']
+            for item in unsafe: 
+                url = url.replace(item, "_")
+            return url
         p = self._parse_predicate(predicate)
         
         for row in self.data:
-            s = self.baseURL[str(row[self.entityIdentifier]).replace(' ', '_')]
+            s = self.baseURL[quoter(str(row[self.entityIdentifier]))]
 
             if(as_type == 'literal'): o = Literal(row[object_column])
-            elif(as_type == 'object'): o = self.baseURL[str(row[object_column]).replace(' ', '_')]
+            elif(as_type == 'object'): o = self.baseURL[quoter(str(row[object_column]))]
             else: o = self._parse_predicate(object_column)
             triplet = (s, p, o)
 
