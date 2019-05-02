@@ -30,7 +30,7 @@ class RDF_API(object):
             s = self.baseURL[str(row[self.entityIdentifier]).replace(' ', '_')]
 
             if(as_type == 'literal'): o = Literal(row[object_column])
-            elif(as_type == 'object'): o = self.baseURL[row[object_column]]
+            elif(as_type == 'object'): o = self.baseURL[str(row[object_column]).replace(' ', '_')]
             else: o = self._parse_predicate(object_column)
             triplet = (s, p, o)
 
